@@ -15,7 +15,7 @@ ENV/
 *.pyc
 *.sqlite3
 db.sqlite3
-media/          # user uploaded files (optional, can store elsewhere)
+media/user_uploads          # user uploaded files (optional, can store elsewhere)
 
 # Environment variables
 .env
