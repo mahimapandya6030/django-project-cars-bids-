@@ -1,0 +1,159 @@
+{% extends 'design/base.html' %}
+{% load static %}
+{% load crispy_forms_tags %}
+{% block 'style'%}
+<style>
+    :root {
+        --primary-color: #4e73df;
+        --secondary-color: #1cc88a;
+        --dark-color: #5a5c69;
+        --light-color: #f8f9fc;
+        --danger-color: #e74a3b;
+        --border-radius: 0.35rem;
+        --box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.15);
+        --transition: all 0.3s ease;
+    }
+
+    .edit-container {
+        background-color: var(--light-color);
+        min-height: 100vh;
+        padding: 2rem 0;
+    }
+
+    .edit-header {
+        color: var(--dark-color);
+        font-weight: 600;
+        margin-bottom: 2rem;
+        text-align: center;
+        position: relative;
+        padding-bottom: 1rem;
+    }
+
+    .edit-header:after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 100px;
+        height: 4px;
+        background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+        border-radius: 2px;
+    }
+
+    .form-container {
+        background: white;
+        border-radius: var(--border-radius);
+        box-shadow: var(--box-shadow);
+        padding: 2.5rem;
+        margin: 0 auto;
+        max-width: 1200px;
+    }
+
+    .form-section {
+        padding: 1.5rem;
+        border-radius: var(--border-radius);
+        transition: var(--transition);
+    }
+
+    .form-section:hover {
+        box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+    }
+
+    .form-section h3 {
+        color: var(--primary-color);
+        margin-bottom: 1.5rem;
+        font-weight: 600;
+        border-bottom: 2px solid var(--light-color);
+        padding-bottom: 0.5rem;
+    }
+
+    .btn-save {
+        background-color: var(--primary-color);
+        border: none;
+        padding: 0.75rem 2rem;
+        font-size: 1.1rem;
+        font-weight: 600;
+        letter-spacing: 0.5px;
+        transition: var(--transition);
+        margin-top: 2rem;
+        display: block;
+        width: 200px;
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    .btn-save:hover {
+        background-color: #3a5bd9;
+        transform: translateY(-2px);
+        box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.1);
+    }
+
+    .btn-save:active {
+        transform: translateY(0);
+    }
+
+    /* Crispy forms adjustments */
+    .form-group label {
+        font-weight: 500;
+        color: var(--dark-color);
+    }
+
+    .form-control {
+        border-radius: var(--border-radius);
+        padding: 0.75rem 1rem;
+        border: 1px solid #d1d3e2;
+    }
+
+    .form-control:focus {
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 0.2rem rgba(78, 115, 223, 0.25);
+    }
+
+    @media (max-width: 768px) {
+        .form-container {
+            padding: 1.5rem;
+        }
+
+        .col-6 {
+            width: 100%;
+            padding: 0;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block 'body' %}
+<div class="container-fluid text-center py-5">
+    <div class="container px-4 py-5">
+        <div class="row g-4">
+            <div class="col d-flex align-items-start">
+                <div>
+                    <h2 class="mb-3 border-bottom" style="color: black">Edit</h2>
+                </div>
+            </div>
+        </div>
+        <form action="" method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="row">
+                <div class="col-6">
+                    {{ user_form|crispy }}
+                    {% if profile_form.instance.photo %}
+                    <img src="{{ profile_form.instance.photo.url }}" width="200" style="margin-bottom:10px;">
+                    {% endif %}
+
+                    <!-- Then use crispy -->
+                    {{ profile_form|crispy }}
+                </div>
+                <div class="col-6">
+                    {{ location_form|crispy }}
+                </div>
+            </div>
+            <button class="btn btn-lg btn-danger" type="submit">Save</button>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block 'footer'%}
+{% endblock %}

@@ -1,0 +1,50 @@
+<div class="card shadow-sm">
+    <img class="bd-placeholder-img card-img-top" width="100%" src="{{list.image.url}}" role="img"
+        aria-label="Placeholder: Thumbnail" focusable="false">
+    <div class="card-body">
+        <h4 class="card-text">{{ list.model }}</h4>
+        <div class="row justify-content-start align-items-center">
+            <div class="col-1">
+                <img src="{{ list.seller.photo.url }}" class="rounded-circle" height="30" width="30"
+                    style="object-fit: cover;">
+            </div>
+            <div class="col-4">
+                <p class="card-text">{{ list.seller.user.username }}</p>
+            </div>
+        </div>
+        <p class="card-text">{{ list.description }}</p>
+        <div class="d-flex justify-content-between align-items-center">
+            <div class="btn-group">
+                <a href="{% url 'listing' list.id %}" type="button" class="btn btn-sm btn-outline-secondary">View</a>
+                {% if list.seller.user == request.user %}
+                <a href="{% url 'edit_view' list.id %}" type="button" class="btn btn-sm btn-outline-secondary">Edit</a>
+                {% endif %}
+            </div>
+            <small class="text-muted">{{list.updated_at}}</small>
+            <button id="like_{{list.id}}" type="button" value="like" class="btn btn-secondary">
+                <!-- <i class="fa fa-thumbs-up"></i> -->
+                <i class="fa-regular fa-heart"></i>
+
+            </button>
+
+        </div>
+    </div>
+</div>
+
+
+<script>
+    $("#like_{{list.id}}").click(function () {
+        $.ajax({
+            type: "POST",
+            url: "{% url 'like' id=list.id %}",
+            data: { 'csrfmiddlewaretoken': '{{csrf_token}}' },
+            dataType: "json",
+            success: function (r) {
+                alert(r);
+            },
+            error: function (rs, e) {
+                alert(e);
+            }
+        });
+    })
+</script>
