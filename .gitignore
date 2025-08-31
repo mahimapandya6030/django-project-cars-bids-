@@ -1,0 +1,60 @@
+# Python cache
+__pycache__/
+*.py[cod]
+*.pyo
+
+# Virtual environments
+venv/
+.venv/
+env/
+ENV/
+
+# Django specific
+*.log
+*.pot
+*.pyc
+*.sqlite3
+db.sqlite3
+media/          # user uploaded files (optional, can store elsewhere)
+
+# Environment variables
+.env
+*.env
+
+# Static & build files (generated, not source)
+staticfiles/
+static_cdn/
+dist/
+build/
+*.egg-info/
+
+# Testing & cache
+.coverage
+*.cover
+*.py,cover
+*.pid
+*.seed
+*.log
+*.out
+*.bak
+*.swp
+.mypy_cache/
+.pytest_cache/
+.tox/
+nosetests.xml
+coverage.xml
+
+# IDEs and OS
+.idea/
+.vscode/
+*.iml
+*.sublime-project
+*.sublime-workspace
+.DS_Store
+Thumbs.db
+
+# Node.js (if you use npm/yarn for frontend)
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
