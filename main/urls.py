@@ -3,6 +3,7 @@ from django.urls import path
 from . import views
 from uuid import UUID
 urlpatterns = [
+    path("register/", views.register_view, name="register"),
     path('admin/', admin.site.urls),
     path('', views.main, name="main"),
     path('home/', views.home, name="home"),

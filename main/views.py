@@ -16,7 +16,20 @@ from django.contrib.auth.models import User
 from django.http import JsonResponse
 from django.core.mail import send_mail
 from django.http import HttpResponse
+from django.contrib.auth import login
 
+def register_view(request):
+    if request.method == "POST":
+        form = UserCreationForm(request.POST)
+        if form.is_valid():
+            user = form.save()
+            login(request, user)  
+            return redirect("home")  
+    else:
+        form = UserCreationForm()
+    
+    return render(request, "design/register.html", {"form": form})
+    
 def main(request):
     return render(request, "design/main.html")
 

@@ -1,0 +1,51 @@
+{% extends "design/base.html" %}
+{% load widget_tweaks %}
+
+{% block 'body' %}
+
+
+
+<div class="d-flex flex-column min-vh-100"> 
+    <section class="py-5 text-center bg-light border-bottom" style="margin-top: 80px;">
+        <div class="container">
+            <h1 class="fw-bold">Welcome to AutoMax 🚗</h1>
+            <p class="text-muted fs-5">
+                Join us today and discover the best deals on used cars near you!
+            </p>
+        </div>
+    </section>
+
+
+    <section class="py-5 flex-grow-1">
+        <div class="container d-flex justify-content-center">
+            <div class="card shadow p-4" style="width: 420px; border-radius: 12px;">
+                <h3 class="text-center mb-4">Create Your Account</h3>
+
+                <form method="POST">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label for="id_username" class="form-label">Username</label>
+                        {{ form.username|add_class:"form-control" }}
+                    </div>
+                    <div class="mb-3">
+                        <label for="id_password1" class="form-label">Password</label>
+                        {{ form.password1|add_class:"form-control" }}
+                    </div>
+                    <div class="mb-3">
+                        <label for="id_password2" class="form-label">Confirm Password</label>
+                        {{ form.password2|add_class:"form-control" }}
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100 fw-bold">Register</button>
+                </form>
+
+                <p class="text-center mt-3 mb-0">
+                    Already have an account? 
+                    <a href="{% url 'login_view' %}" class="text-decoration-none">Login</a>
+                </p>
+            </div>
+        </div>
+    </section>
+
+
+{% endblock %}
+
