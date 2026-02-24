@@ -1,0 +1,47 @@
+{% extends "design/base.html" %}
+
+
+{% block 'body' %}
+
+
+<div class="container-fluid mt-5">
+    <div class="card shadow-lg border-0 mx-auto" style="max-width: 1100px; width: 95%;">
+        <div class="card-header bg-primary text-white py-3">
+            <h3 class="mb-0">Test Drive Requests</h3>
+        </div>
+
+        <div class="card-body p-4">
+            {% if drives %}
+                <table class="table table-bordered table-hover align-middle text-center">
+                    <thead class="table-light">
+                        <tr>
+                            <th>User</th>
+                            <th>Car Model</th>
+                            <th>Date</th>
+                            <th>Time</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        {% for d in drives %}
+                        <tr>
+                            <td><strong>{{ d.user.user.username }}</strong></td>
+                            <td>{{ d.listing.model }}</td>
+                            <td>{{ d.date }}</td>
+                            <td>{{ d.time }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            {% else %}
+                <p class="text-muted text-center fs-5">No requests at the moment.</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+
+
+
+{% endblock%}
+

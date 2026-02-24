@@ -3,18 +3,31 @@
 
 {% block 'style'%}
 <style>
-
+#myVideo {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    z-index: -1;
+}
+html, body {
+    height: 100%;
+    overflow-x: hidden;
+}
 </style>
 {% endblock %}
 {% block 'header'%}
 {% endblock %}
 
 {% block 'body' %}
-<div class="d-flex h-100 text-center text-white index">
+<!-- <div class="d-flex h-100 text-center text-white index"> -->
+    <div class="d-flex h-100 text-center text-white index justify-content-center">
     <video autoplay muted loop id="myVideo">
         <source src="{% static 'main/bg.mp4' %}" type="video/mp4">
     </video>
-    <div class="d-flex w-100 h-100 p-3 mx-auto flex-column main-content">
+    <div class="d-flex w-100 h-100 p-3 flex-column main-content">
         <header class="mb-auto">
             <div>
                 <h3 class="float-md-start mb-0">AutoMax</h3>
@@ -32,7 +45,7 @@
             <p class="lead">Looking to buy or sell a used car? We've got you
                 covered. </br> AutoMax is the leading used car marketplace.</p>
             <p class="lead">
-                <a href="{% url 'register'%}"
+                <a href="{% url 'register' %}"
                     class="btn btn-lg btn-secondary fw-bold border-white bg-white">Register</a>
             </p>
         </main>

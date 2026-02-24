@@ -2,9 +2,9 @@ from django.shortcuts import render
 from django.shortcuts import redirect
 from django.shortcuts import HttpResponse
 from django.contrib.auth.decorators import login_required
-from .models import Listing, Likedlisting
+from .models import Listing, Likedlisting, Testdrive
 from user.models import Profile, Location
-from .forms import ListingForm
+from .forms import ListingForm, TestDriveForm
 from user.forms import LocationForm
 from django.contrib import messages
 from .filters import ListingFilter
@@ -17,6 +17,14 @@ from django.http import JsonResponse
 from django.core.mail import send_mail
 from django.http import HttpResponse
 from django.contrib.auth import login
+from rest_framework.viewsets import ModelViewSet
+from rest_framework.decorators import action
+from rest_framework.response import Response
+from .models import Listing
+from .serializer import ListingSerializer
+from rest_framework.permissions import IsAdminUser, IsAuthenticated
+from django_filters.rest_framework import DjangoFilterBackend
+from .pagination import Listingpagination
 
 def register_view(request):
     if request.method == "POST":
@@ -138,3 +146,66 @@ def send_test_email(request, id):
             "success": False,
             "info": e,
         })
+        
+        
+@login_required        
+def testdrive_booking(request, id):
+    listing = get_object_or_404(Listing, id=id)
+    
+    if request.method == 'POST':
+        form = TestDriveForm(request.POST)
+        if form.is_valid():
+            test_drive = form.save(commit=False)
+            test_drive.listing = listing
+            test_drive.user = request.user.profile
+            test_drive.save()
+            messages.success(request, "your Test Drive is Booked!")
+            return redirect('listing', id=listing.id)
+    else:
+        form = TestDriveForm()
+        
+    return render(request, 'components/testdrive_book.html', {
+        'form': form,
+        'listing': listing
+    })           
+            
+        
+@login_required
+def my_test_drive_requests(request):
+    drives = Testdrive.objects.filter(listing__seller=request.user.profile)
+    return render(request, "components/my_test_drive.html", {"drives": drives})
+        
+        
+        
+class Listingviewset(ModelViewSet):
+    queryset = Listing.objects.all()
+    serializer_class = ListingSerializer
+    permission_classes = [IsAuthenticated]
+    pagination_class = Listingpagination 
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields = ['model', 'brand', 'price']
+    
+    @action(detail=True, methods=['post'], permission_classes=[IsAuthenticated])
+    def mark_sold(self, request, pk=None):
+        print("Authorization header:", request.headers.get("Authorization"))
+        print("Request user:", request.user)
+        listing = self.get_object()
+        
+        if listing.seller.user != request.user:
+            return Response(
+                {"error": "You are not allowed to mark this listing as sold."},
+                status=403
+            )    
+            
+        if listing.is_sold:
+            return Response({"message": "Listing is already marked as sold"})        
+
+        
+        
+        listing.is_sold = True
+        listing.save()
+        
+        return Response({"message": "Listing marked as sold successfully"})
+        
+        
+        

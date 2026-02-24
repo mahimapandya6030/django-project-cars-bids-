@@ -1,8 +1,9 @@
 from django.db import models
-import uuid
+import uuid 
 from user.models import Profile, Location
 from .consts import CARS_BRANDS, TRANSMISSION_OPTIONS
 from .utils import user_Listing_attr
+
 
 class Listing(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, unique=True, editable=False)
@@ -19,6 +20,8 @@ class Listing(models.Model):
     transmission = models.CharField(max_length=30, choices=TRANSMISSION_OPTIONS, default=None)
     location = models.OneToOneField(Location, on_delete=models.SET_NULL, null=True)
     image = models.ImageField(upload_to=user_Listing_attr)
+    is_sold = models.BooleanField(default=False)
+    
     
     def __str__(self):
         return f'{self.seller.user.username}\'s Listing - {self.model}'
@@ -30,4 +33,20 @@ class Likedlisting(models.Model):
     
     def __str__(self):
         return super().__str__()+ f' - {self.listing.model} liked by {self.profile.user.username}'
+
+
+
+
+#test drive booking:-
+class Testdrive(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False) 
+    listing = models.ForeignKey(Listing, on_delete=models.CASCADE)
+    user = models.ForeignKey(Profile, on_delete=models.CASCADE)
+    date = models.DateField()
+    time = models.TimeField()
+    created_at = models.DateTimeField(auto_now_add=True)
     
+    def __str__(self):
+        return f"Test drive for {self.listing.model}"
+    
+       

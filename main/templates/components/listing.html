@@ -7,37 +7,36 @@
 {% load crispy_forms_tags %}
 {% block style %}
 <style>
+    .card.listing-card {
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        border-radius: 1rem;
+        overflow: hidden;
+        border: none;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    }
 
-.card.listing-card {
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-    border-radius: 1rem;
-    overflow: hidden;
-    border: none;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-}
+    .card.listing-card:hover {
+        transform: translateY(-6px);
+        box-shadow: 0 10px 24px rgba(0, 0, 0, 0.1);
+    }
 
-.card.listing-card:hover {
-    transform: translateY(-6px);
-    box-shadow: 0 10px 24px rgba(0, 0, 0, 0.1);
-}
+    .card.listing-card img.listing-img {
+        height: 400px;
+        object-fit: cover;
+        transition: filter 0.3s ease;
+    }
 
-.card.listing-card img.listing-img {
-    height: 400px;
-    object-fit: cover;
-    transition: filter 0.3s ease;
-}
+    .card.listing-card img.listing-img:hover {
+        filter: brightness(95%);
+    }
 
-.card.listing-card img.listing-img:hover {
-    filter: brightness(95%);
-}
-
-.card.listing-card .seller-avatar {
-    height: 50px;
-    width: 50px;
-    object-fit: cover;
-    border-radius: 50%;
-    border: 3px solid #0d6efd;
-}
+    .card.listing-card .seller-avatar {
+        height: 50px;
+        width: 50px;
+        object-fit: cover;
+        border-radius: 50%;
+        border: 3px solid #0d6efd;
+    }
 </style>
 
 
@@ -125,6 +124,32 @@
                             <button
                                 class="w-100 btn btn-lg btn-outline-primary my-3">{{listing.seller.phone_number}}</button>
                             <button id="sendEmail" class="w-100 btn btn-lg btn-outline-primary">Send Email</button>
+
+
+                            <button id="bookTest" class="w-100 btn btn-lg btn-outline-primary my-3"
+                                data-url="{% url 'testdrive' listing.id %}">
+                                Book Test Drive 🚗
+                            </button>
+                            \
+                            <div class="listing-card">
+                                <h3>{{ listing.model }}</h3>
+                                <!-- <p>Price: {{ listing.price }}</p> -->
+                                <p>Status:
+                                    {% if listing.is_sold %}
+                                    <span style="color: green;">Sold</span>
+                                    {% else %}
+                                    <span style="color: red;">Available</span>
+                                    {% endif %}
+                                </p>
+
+                                {% if not listing.is_sold %}
+                                {% if listing.seller.user == request.user and not listing.is_sold %}
+                                <button onclick="markSold('{{ listing.id }}')">Mark Sold</button>
+                                {% endif %}
+                                {% endif %}
+                            </div>
+                            </form>
+
                         </div>
                     </div>
                 </div>
@@ -142,14 +167,17 @@
         </div>
     </div>
 </main>
-
+<div id="pagination" class="mt-3 d-flex justify-content-center">
+    <button id="prevBtn" class="btn btn-primary mx-1" onclick="fetchListings(prevPage)" disabled>Previous</button>
+    <button id="nextBtn" class="btn btn-primary mx-1" onclick="fetchListings(nextPage)" disabled>Next</button>
+</div>
 {% endblock %}
 {% block 'footer' %}
 
 
 <script>
- $("#sendEmail").click(function(){
-    $.ajax({
+    $("#sendEmail").click(function () {
+        $.ajax({
             type: "POST",
             url: "{% url 'sendmail' id=listing.id %}",
             data: { 'csrfmiddlewaretoken': '{{ csrf_token }}' },
@@ -161,6 +189,85 @@
                 alert(rs.info)
             }
         })
- })
+    })
 </script>
+<script>
+    document.getElementById('bookTest')?.addEventListener('click', function () {
+        const url = this.dataset.url;
+        if (url) window.location.href = url;
+    });
+</script>
+
+<script>
+    function getCSRFToken() {
+    let cookieValue = null;
+    const cookies = document.cookie.split(";");
+
+    for (let cookie of cookies) {
+        cookie = cookie.trim();
+        if (cookie.startsWith("csrftoken=")) {
+            cookieValue = cookie.substring(10);
+            break;
+        }
+    }
+    return cookieValue;
+}
+
+    function markSold(listingId) {
+        const token = localStorage.getItem("accessToken");
+
+        console.log("TOKEN IN LOCALSTORAGE:", token);
+
+        if (!token) {
+            alert("You must be logged in to mark as sold.");
+            return;
+        }
+
+        fetch(`/api/listings/${listingId}/mark_sold/`, {
+            method: "POST",
+            headers: {
+                "Authorization": "Bearer " + token,
+                "Content-Type": "application/json",
+                "X-CSRFToken": getCSRFToken(),
+
+            }
+        })
+            .then(async res => {
+                console.log("STATUS:", res.status);
+
+                const data = await res.json();
+                console.log("RESPONSE:", data);
+
+                if (res.status === 401) {
+                    alert("Token missing or invalid.");
+                } else if (res.status === 403) {
+                    alert("You are not allowed to mark this listing as sold.");
+                } else {
+                    alert(data.message);
+                }
+            })
+            .catch(err => console.error(err));
+    }
+
+
+
+
+
+
+</script>
+<!-- <script>
+function markSold(id) {
+    fetch(`/api/listing/${id}/mark_sold/`, {
+        method: "POST",
+        headers: { "X-CSRFToken": "{{ csrf_token }}" }
+    })
+    .then(res => res.json())
+    .then(data => location.reload());
+}
+</script> -->
+
+
+
+
+
 {% endblock %}
