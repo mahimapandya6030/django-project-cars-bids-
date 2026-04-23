@@ -24,7 +24,7 @@ urlpatterns = [
     # path('api/listing/<uuid:id>/', ListingRetrieveUpdateDestroyAPIView.as_view(), name='api-listing-detail'),
     path("testdrive/<uuid:id>/", views.testdrive_booking, name="testdrive"),
     path("my-testdrives/", views.my_test_drive_requests, name="my_test_drives"),
-
+    path('mark-sold/<uuid:listing_id>/', views.mark_sold, name='mark_sold'),
 
 ]
 

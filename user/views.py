@@ -1,5 +1,4 @@
 from django.shortcuts import render, redirect
-from django.shortcuts import HttpResponse
 from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
@@ -21,21 +20,6 @@ def login_view(request):
         form = AuthenticationForm()
     return render(request, 'user/login.html', {'form':form})
 
-
-class Registerview(View):
-    def get(self, request):
-        register_form = UserCreationForm()
-        return render(request, 'user/register.html', {'register_form': register_form})
-    
-    def post(self, request):
-        register_form = UserCreationForm(request.POST)
-        if register_form.is_valid():
-            user = register_form.save()
-            user.refresh_from_db()
-            messages.success(request, f"you have successfully registered.")
-            return redirect('home')
-        else:
-            return render(request, 'user/register.html', {'register_form': register_form})
 
 @login_required
 def logout_view(request):
@@ -77,3 +61,5 @@ class Profileview(View):
                                                      'location_form': location_form,
                                                      'user_listing': user_listing,
                                                      'user_liked_listings':user_liked_listings})
+        
+        

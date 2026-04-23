@@ -22,20 +22,25 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 from .models import Listing
 from .serializer import ListingSerializer
+from django.core.paginator import Paginator
 from rest_framework.permissions import IsAdminUser, IsAuthenticated
 from django_filters.rest_framework import DjangoFilterBackend
 from .pagination import Listingpagination
+
 
 def register_view(request):
     if request.method == "POST":
         form = UserCreationForm(request.POST)
         if form.is_valid():
             user = form.save()
-            login(request, user)  
-            return redirect("home")  
+            login(request, user)
+            messages.success(request, "Account created successfully!")
+            return redirect("home")
+        else:
+            print(form.errors)  
     else:
         form = UserCreationForm()
-    
+
     return render(request, "design/register.html", {"form": form})
     
 def main(request):
@@ -45,9 +50,14 @@ def main(request):
 def home(request):
     listing = Listing.objects.all()
     listing_filters = ListingFilter(request.GET, queryset=listing)
+    paginator = Paginator(listing_filters.qs, 6)  # 6 per page
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+    
     context = {
         'listing' : listing,
         'listing_filter': listing_filters,
+        'page_obj': page_obj,
     }
     return render(request, 'design/home.html', context)
 
@@ -110,21 +120,22 @@ def edit_view(request, id):
                                                     'profile_form': profile_form})    
     
     
-@login_required    
+
+
+@login_required
 def like_listing_view(request, id):
     listing = get_object_or_404(Listing, id=id)
 
-    liked_listing, created = Likedlisting.objects.get_or_create(
-        profile=request.user.profile, listing=listing)
+    liked, created = Likedlisting.objects.get_or_create(
+        profile=request.user.profile,
+        listing=listing
+    )
 
     if not created:
-        liked_listing.delete()
-    else:
-        liked_listing.save()
+        liked.delete()
+        return JsonResponse({'is_liked_by_user': False})
 
-    return JsonResponse({
-        'is_liked_by_user': created,
-    })
+    return JsonResponse({'is_liked_by_user': True})
 
 
 def send_test_email(request, id):
@@ -175,7 +186,15 @@ def my_test_drive_requests(request):
     drives = Testdrive.objects.filter(listing__seller=request.user.profile)
     return render(request, "components/my_test_drive.html", {"drives": drives})
         
-        
+@login_required
+def mark_sold(request, listing_id):
+    listing = get_object_or_404(Listing, id=listing_id)
+
+    if listing.seller.user == request.user:
+        listing.is_sold = True
+        listing.save()
+
+    return redirect('home')        
         
 class Listingviewset(ModelViewSet):
     queryset = Listing.objects.all()
